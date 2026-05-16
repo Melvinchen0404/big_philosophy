@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline of the Universe</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#04050f;
+  --bg2:#080a1a;
+
+  --nebula1:#312e81;
+  --nebula2:#0f172a;
+
+  --gold:#fbbf24;
+  --gold-light:#fde68a;
+
+  --cyan:#38bdf8;
+  --purple:#a78bfa;
+  --red:#fb7185;
+  --green:#4ade80;
+
+  --text:#f8fafc;
+  --text-dim:#94a3b8;
+
+  --border:rgba(255,255,255,0.08);
+  --card-bg:rgba(15,23,42,0.88);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:'Cormorant Garamond',serif;
+  background:
+    radial-gradient(circle at top left, rgba(15,120,120,0.12), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(20,180,170,0.10), transparent 40%),
+    var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+.back-link{
+  display:inline-block;
+  margin-bottom:28px;
+  font-family:'Space Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  text-decoration:none;
+  border:1px solid var(--border);
+  padding:7px 14px;
+  border-radius:4px;
+  transition:0.2s;
+}
+.back-link:hover{
+  color:var(--gold-light);
+  border-color:rgba(251,191,36,0.4);
+}
+
+
+/* Starfield */
+
+#starfield{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* Nebula */
+
+.nebula-blob{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:0.16;
+  pointer-events:none;
+  z-index:1;
+}
+
+header{
+  position:relative;
+  z-index:10;
+  text-align:center;
+  padding:70px 20px 50px;
+  background:linear-gradient(to bottom, rgba(2,20,20,0.98), transparent);
+}
+
+header h1{
+  font-size:clamp(2.5rem,6vw,5rem);
+  font-weight:300;
+  letter-spacing:0.12em;
+  color:var(--gold-light);
+  margin-bottom:14px;
+  text-shadow:0 0 40px rgba(199,255,243,0.15);
+}
+
+header p{
+  font-family:'Space Mono',monospace;
+  font-size:0.75rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+}
+
+/* Trivia */
+
+.trivia-box{
+  margin-top:36px;
+  padding:24px;
+  border-radius:10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(251,191,36,0.08),
+      rgba(255,255,255,0.02)
+    );
+
+  border:1px solid rgba(251,191,36,0.18);
+
+  position:relative;
+  overflow:hidden;
+}
+
+.trivia-box::before{
+  content:"FUN FACT";
+  position:absolute;
+  top:12px;
+  right:16px;
+
+  font-family:'Space Mono',monospace;
+  font-size:0.55rem;
+  letter-spacing:0.18em;
+
+  color:rgba(255,255,255,0.25);
+}
+
+.trivia-title{
+  color:var(--gold-light);
+  font-size:1.15rem;
+  margin-bottom:12px;
+}
+
+.trivia-text{
+  line-height:1.8;
+  color:var(--text);
+  font-size:1rem;
+}
+
+/* Era bar */
+
+.era-bar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  display:flex;
+  overflow-x:auto;
+  backdrop-filter:blur(12px);
+  background:rgba(2,20,20,0.92);
+  border-bottom:1px solid var(--border);
+  scrollbar-width:none;
+}
+
+.era-bar::-webkit-scrollbar{
+  display:none;
+}
+
+.era-btn{
+  border:none;
+  background:none;
+  color:var(--text-dim);
+  padding:16px 22px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:0.25s;
+  font-family:'Space Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+}
+
+.era-btn:hover{
+  color:var(--gold-light);
+  background:rgba(255,255,255,0.03);
+}
+
+.layout{
+  display:flex;
+  position:relative;
+  z-index:5;
+}
+
+/* Sidebar */
+
+.timeline-col{
+  width:300px;
+  flex-shrink:0;
+  height:calc(100vh - 50px);
+  overflow-y:auto;
+  position:sticky;
+  top:50px;
+  border-right:1px solid var(--border);
+  padding:20px 0;
+}
+
+.timeline-col::-webkit-scrollbar{
+  width:5px;
+}
+
+.timeline-col::-webkit-scrollbar-thumb{
+  background:var(--border);
+}
+
+.era-section-label{
+  font-family:'Space Mono',monospace;
+  font-size:0.55rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  padding:20px 24px 10px;
+  border-top:1px solid var(--border);
+}
+
+.timeline-item{
+  display:flex;
+  gap:12px;
+  padding:12px 24px;
+  cursor:pointer;
+  transition:0.2s;
+  position:relative;
+}
+
+.timeline-item:hover{
+  background:rgba(255,255,255,0.03);
+}
+
+.timeline-item.active{
+  background:rgba(143,211,193,0.08);
+}
+
+.timeline-item.active::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:3px;
+  background:var(--gold);
+}
+
+.item-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  margin-top:6px;
+  flex-shrink:0;
+}
+
+.item-date{
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;
+  color:var(--gold);
+  margin-bottom:3px;
+}
+
+.item-title{
+  font-size:0.95rem;
+  line-height:1.3;
+}
+
+/* Main content */
+
+.detail-panel{
+  flex:1;
+  padding:50px 60px;
+  max-width:900px;
+}
+
+.detail-content{
+  animation:fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.detail-era{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:4px;
+  margin-bottom:20px;
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+}
+
+.detail-date{
+  font-family:'Space Mono',monospace;
+  color:var(--gold);
+  letter-spacing:0.08em;
+  margin-bottom:12px;
+}
+
+.detail-title{
+  font-size:clamp(2rem,4vw,3rem);
+  font-weight:300;
+  color:var(--gold-light);
+  margin-bottom:24px;
+}
+
+.detail-visual{
+  height:220px;
+  margin-bottom:32px;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+}
+
+.detail-body{
+  font-size:1.12rem;
+  line-height:1.9;
+}
+
+.detail-body p + p{
+  margin-top:18px;
+}
+
+.detail-facts{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:16px;
+  margin-top:36px;
+}
+
+.fact-card{
+  padding:18px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+}
+
+.fact-label{
+  font-family:'Space Mono',monospace;
+  font-size:0.55rem;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  color:var(--text-dim);
+  margin-bottom:8px;
+}
+
+.fact-value{
+  color:var(--gold-light);
+  font-size:1rem;
+  font-weight:600;
+}
+
+.fact-sub{
+  margin-top:4px;
+  font-size:0.85rem;
+  color:var(--text-dim);
+}
+
+.nav{
+  display:flex;
+  gap:14px;
+  margin-top:40px;
+}
+
+.nav button{
+  background:none;
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:10px 18px;
+  cursor:pointer;
+  border-radius:4px;
+  transition:0.2s;
+  font-family:'Space Mono',monospace;
+  font-size:0.65rem;
+}
+
+.nav button:hover{
+  border-color:var(--gold);
+  color:var(--gold-light);
+}
+
+@media(max-width:900px){
+
+  .layout{
+    flex-direction:column;
+  }
+
+  .timeline-col{
+    width:100%;
+    height:auto;
+    position:relative;
+    top:0;
+    border-right:none;
+    border-bottom:1px solid var(--border);
+  }
+
+  .detail-panel{
+    padding:30px 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="starfield"></canvas>
+
+<div class="nebula-blob"
+style="width:650px;height:650px;top:-150px;left:-200px;
+background:radial-gradient(circle,#4338ca,transparent)">
+</div>
+
+<div class="nebula-blob"
+style="width:500px;height:500px;top:40%;right:-120px;
+background:radial-gradient(circle,#7c3aed,transparent)">
+</div>
+
+<div class="nebula-blob"
+style="width:450px;height:450px;bottom:-100px;left:25%;
+background:radial-gradient(circle,#2563eb,transparent)">
+</div>
+
+<header>
+  <a href="philosophy.htm" class="back-link">← Big philosophy</a>
+
+  <h1>Timeline of the Universe</h1>
+  <p>13.8 billion years · from the Big Bang to today</p>
+</header>
+
+<div class="era-bar" id="eraBar"></div>
+
+<div class="layout">
+
+  <div class="timeline-col" id="timelineCol"></div>
+
+  <div class="detail-panel">
+    <div id="detailContent"></div>
+  </div>
+
+</div>
+
+<script>
+
+const ERAS = [
+  { id:'cosmic', label:'Early Universe', color:'#4bc0b8' },
+  { id:'stars', label:'Stars & Galaxies', color:'#58e1d9' },
+  { id:'solar', label:'Solar System', color:'#7fffd4' },
+  { id:'life', label:'Life on Earth', color:'#5fb7c8' },
+  { id:'human', label:'Human Era', color:'#8fd3c1' }
+];
+
+const EVENTS = [
+
+{
+id:'bigbang',
+era:'cosmic',
+date:'13.8 billion years ago',
+title:'The Big Bang',
+color:'#4bc0b8',
+body:`The universe began in an extremely hot, dense state. Space itself rapidly expanded, carrying matter and energy outward in every direction.
+
+Current physics cannot yet fully describe the earliest instant of the universe. The Big Bang marks the beginning of observable cosmic history.`,
+
+trivia:`<b>The man who named it hated it</b><br> In 1949, the British astronomer Fred Hoyle (University of Cambridge) appeared on BBC Radio to explain rival theories of cosmic origins. When describing the idea that the universe began in a single explosive moment, he called it — with audible contempt — "this Big Bang idea." Although he had coined the label dismissively and later spent decades fighting the Big Bang, Hoyle — himself a supporter of the Steady State model of a universe with neither a beginning nor an end — ended up giving the winning theory the most memorable name in (arguably) all of science.`,
+
+facts:[
+{label:'Temperature', value:'1.4 × 10³² K', sub:'Planck temperature'},
+{label:'Beginning', value:'Space & Time', sub:'known physics begins'},
+{label:'Universe Age', value:'13.8 billion years', sub:'today'}
+]
+},
+
+{
+id:'inflation',
+era:'cosmic',
+date:'10⁻³⁶ seconds after the Big Bang',
+title:'Cosmic Inflation',
+color:'#4bc0b8',
+body:`The universe underwent an extraordinary burst of exponential expansion, growing enormously in a fraction of a second.
+
+Tiny quantum fluctuations were stretched across space, becoming the seeds of future galaxies and cosmic structure.`,
+
+trivia:`<b>Einstein's “greatest blunder”</b><br> In 1917, Albert Einstein applied his equations of general relativity to the entire universe — and was horrified by the result. His equations predicted that the universe must be dynamic, either expanding or contracting. At the time, nearly everyone believed the universe was static and eternal. To force his equations to produce a stable universe, Einstein introduced a mathematical fudge factor called the cosmological constant (Λ), a kind of repulsive energy built into space itself. After Edwin Hubble discovered in 1929 that the universe is expanding, Einstein reportedly called the cosmological constant his “greatest blunder” and abandoned it.<br><br>Plot twist: in 1998, astronomers discovered that the expansion of the universe is actually accelerating. Something appears to be pushing space apart faster and faster. Today, this mysterious effect is called dark energy, and one of the simplest explanations for it is … Einstein’s cosmological constant.`,
+
+facts:[
+{label:'Expansion', value:'≥ 10²⁶×', sub:'extremely rapid'},
+{label:'Duration', value:'Tiny fraction', sub:'of a second'},
+{label:'Result', value:'Smooth Universe', sub:'large-scale uniformity'}
+]
+},
+
+{
+id:'cmb',
+era:'cosmic',
+date:'380,000 years after the Big Bang',
+title:'Cosmic Microwave Background',
+color:'#58e1d9',
+body:`The universe cooled enough for electrons and protons to combine into neutral atoms. Light could now travel freely through space.
+
+That ancient light still fills the universe today as the Cosmic Microwave Background radiation.`,
+
+trivia: `<b>Not pigeon droppings but a Nobel Prize-worthy discovery</b><br> In 1964, radio astronomers Arno Penzias and Robert Wilson were using a giant horn antenna in New Jersey when they picked up a persistent, annoying hiss coming equally from every direction in the sky. They assumed it to be interference (including pigeon droppings in the antenna). It turns out that they had stumbled upon the Cosmic Microwave Background (CMB) or afterglow of the Big Bang itself, emitted 380,000 years after the universe began and travelling ever since. The CMB is one of the most precise blackbody spectra ever measured: its temperature is 2.725 K everywhere across the sky — uniform to one part in 100,000. Penzias and Wilson ended up winning the 1978 Nobel Prize in Physics for their accidental discovery.`,
+
+facts:[
+{label:'Temperature Then', value:'~3000 K', sub:'recombination era'},
+{label:'Temperature Today', value:'2.725 K', sub:'redshifted'},
+{label:'Discovered', value:'1964', sub:'Penzias & Wilson'}
+]
+},
+
+{
+id:'stars',
+era:'stars',
+date:'~200 million years after the Big Bang',
+title:'First Stars Ignite',
+color:'#58e1d9',
+body:`The first stars formed from collapsing clouds of hydrogen and helium.
+
+These massive stars forged the first heavy elements through nuclear fusion and supernova explosions.`,
+
+trivia:`<b>Pop III stars: live fast, burn bright, die as a supernova</b><br> When the universe had cooled sufficiently, the first stars were born as population III stars. Pop III stars had a critical handicap: they were made of almost pure hydrogen and helium, with no heavier elements at all. This matters because heavier elements act as a coolant in collapsing gas clouds, regulating how fast and how big stars grow. Without them, the gas clouds collapsed almost unchecked.\n\nThe result was stars of staggering size — theoretically 100 to 1,000 times the mass of our Sun,flooding the universe with ultraviolet radiation and burning swiftly through their fuel in a few million years. At their deaths, explosions seeded the universe with everything needed to build planets, chemistry, and (eventually) life. Every carbon atom in our bodies was forged inside a dying star, likely one of these giants.`,
+
+facts:[
+{label:'Population', value:'Population III', sub:'first generation'},
+{label:'Composition', value:'Hydrogen & Helium', sub:'almost no metals'},
+{label:'Importance', value:'Heavy Elements', sub:'created in stars'}
+]
+},
+
+{
+id:'galaxies',
+era:'stars',
+date:'A few hundred million years after the Big Bang',
+title:'First Galaxies Form',
+color:'#58e1d9',
+body:`Gravity gathered stars, gas, and dark matter into the first galaxies.
+
+Over billions of years, galaxies merged and evolved into the large cosmic web observed today.`,
+
+trivia:`<b>How many galaxies are there?</b><br> For decades, astronomers estimated that the observable universe contained around 200 billion galaxies. In 2016, the astronomer Christopher Conselice and his team (University of Nottingham) re-examined deep-field observations and used new statistical methods to account for extremely faint and distant galaxies. Their conclusion dramatically changed the estimate: the observable universe may contain as many as two trillion galaxies — making the cosmos seem ten times as large almost overnight. If you counted one galaxy every second without stopping, it would take more than 63,000 years to count them all. Even then, astronomers suspect we may still be undercounting them.`,
+
+facts:[
+{label:'Observed By', value:'JWST', sub:'deep universe'},
+{label:'Structure', value:'Cosmic Web', sub:'filaments & voids'},
+{label:'Contents', value:'Stars + Dark Matter', sub:'galactic halos'}
+]
+},
+
+{
+id:'milkyway',
+era:'stars',
+date:'~13.5–13.0 billion years ago',
+title:'The Milky Way Begins Forming',
+color:'#5fb7c8',
+body:`Our galaxy assembled gradually through mergers of smaller proto-galaxies. It appears likely that the Milky Way formed by an combination of rapid, dissipative collapse and mergers, but the relative contributions of these two mechanisms remain controversial.
+
+Today, the Milky Way contains hundreds of billions of stars and a supermassive black hole called Sagittarius A*.`,
+
+trivia:`<b>Named after spilt breast milk — literally</b><br> In Greek mythology, Zeus fathered the infant Heracles with a mortal woman but wanted his son to have divine power. Zeus hatched the plan of holding Heracles to an unsuspecting and sleeping Hera and let the infant suckle from her. However, once Hera awoke and understood the situation, she pushed the baby away and her unexpressed milk was sprayed in an arc across the heavens, creating our home galaxy with all its stars.`,
+
+facts:[
+{label:'Diameter', value:'~100,000 ly', sub:'light-years'},
+{label:'Stars', value:'100–400 billion', sub:'estimated'},
+{label:'Central Black Hole', value:'Sagittarius A*', sub:'~4 million solar masses'}
+]
+},
+
+{
+id:'solar',
+era:'solar',
+date:'4.57 billion years ago',
+title:'Birth of the Solar System',
+color:'#7fffd4',
+body:`A cloud of gas and dust collapsed under gravity, forming the Sun and a rotating protoplanetary disk.
+
+Planets formed through accretion as dust grains collided and combined over millions of years.`,
+
+trivia:`<b>A philosopher figured it out in 1755</b><br> Immanuel Kant is revered as one of the greatest philosophers in the Western tradition. He is not usually credited as an astrophysicist, although he should be. In 1755, aged just 31, Kant proposed the Nebular Hypothesis: our solar system formed from a large rotating cloud of gas and dust that collapsed under the influence of gravity. This is essentially what we teach today. Kant worked out this hypothesis from pure reason and Newton's laws alone and without a telescope. The theory is now called the Kant–Laplace Nebular Hypothesis, because the mathematician Pierre-Simon Laplace independently formalized it mathematically in 1796.`,
+
+facts:[
+{label:'Sun Age', value:'4.6 billion years', sub:'current estimate'},
+{label:'Planets', value:'8', sub:'major planets'},
+{label:'Origin', value:'Solar Nebula', sub:'gas & dust cloud'}
+]
+},
+
+{
+id:'earth',
+era:'solar',
+date:'4.54 billion years ago',
+title:'Earth Forms',
+color:'#7fffd4',
+body:`The young Earth formed through countless collisions of rocky material orbiting the Sun.
+
+A giant impact with a Mars-sized body likely formed the Moon.`,
+
+trivia:`<b>A life-changing collision</b><br> About 4.5 billion years ago, a Mars-sized planet called Theia collided with the early Earth. The impact was so violent that it partially vaporized both bodies. A ring of debris formed around Earth and gradually came together to create the Moon. At first, the Moon was much closer to our planet and far larger in the sky, causing extremely high tides across the magma oceans. Over time, the Moon has moved away from Earth at about 3.8 cm per year. The Moon plays an important role in making the Earth stable: its gravity helps to keep Earth's axial tilt steady, preventing long-term climate swings and allowing for complex life to develop.`,
+
+facts:[
+{label:'Earth Age', value:'4.54 billion years', sub:'radiometric dating'},
+{label:'Moon Origin', value:'Giant Impact', sub:'Theia hypothesis'},
+{label:'Early State', value:'Molten Surface', sub:'magma ocean'}
+]
+},
+
+{
+id:'life',
+era:'life',
+date:'~3.8 billion years ago',
+title:'First Life Appears',
+color:'#5fb7c8',
+body:`Simple microbial life emerged on Earth, possibly near hydrothermal vents in the oceans.
+
+The origin of life remains one of science’s greatest unsolved mysteries.`,
+
+trivia: `<b>One of life's greatest mysteries: life itself</b><br> By cosmic standards, life on Earth got started almost immediately. The planet formed about 4.5 billion years ago, and by roughly 3.8 to 4.0 billion years ago, there is evidence that simple life already existed in the oceans. That leaves a relatively short window for life to emerge from non-living chemistry. This process, known as abiogenesis, is both remarkably fast and deeply puzzling. The window for life to emerge was barely open: our young planet was still being bombarded by asteroids, the surface was volcanically violent and hostile to life, and the atmosphere had no oxygen. Yet somehow, in hydrothermal vents on the ocean floor or in shallow tidal pools, we crossed the threshold from chemistry into biology. How non-living molecules became self-replicating, metabolizing cells remains one of the greatest unsolved problems in all of science.`,
+
+facts:[
+{label:'Earliest Evidence', value:'~3.7–3.8 Gya', sub:'ancient rocks'},
+{label:'Organisms', value:'Prokaryotes', sub:'single-celled'},
+{label:'Possible Origin', value:'Hydrothermal Vents', sub:'deep oceans'}
+]
+},
+
+{
+id:'oxygen',
+era:'life',
+date:'~2.4 billion years ago',
+title:'Great Oxidation Event',
+color:'#5fb7c8',
+body:`Photosynthetic cyanobacteria released oxygen into the atmosphere. At the same time, several important aspects of the oxygen trajectories associated with the Great Oxidation Event remain unresolved.
+
+This transformed Earth permanently and enabled future complex life.`,
+
+trivia: `<b>A genocide caused by oxygen</b><br> For the first two billion years of life, oxygen was essentially absent from Earth's atmosphere. Contrary to popular belief, this was perfectly fine, because all life was anaerobic. Cyanobacteria eventually evolved photosynthesis and began releasing oxygen as a waste product. To the organisms alive at the time, oxygen was not life-giving but rather toxic: it reacted violently with proteins and cell membranes. The Great Oxidation Event around 2.4 billion years ago triggered what may be the largest mass extinction in Earth's history — the silent genocide of the anaerobic world. The atmosphere turned poisonous to most life on Earth. But a handful of organisms adapted, evolving ways to tolerate and then exploit oxygen — and from that catastrophe came all complex, oxygen-breathing life, including us.`,
+
+facts:[
+{label:'Produced By', value:'Cyanobacteria', sub:'photosynthesis'},
+{label:'Atmosphere Change', value:'Oxygen Rise', sub:'major transformation'},
+{label:'Modern Oxygen', value:'21%', sub:'today’s atmosphere'}
+]
+},
+
+{
+id:'cambrian',
+era:'life',
+date:'541 million years ago',
+title:'Cambrian Explosion',
+color:'#5fb7c8',
+body:`Complex multicellular organisms diversified rapidly in Earth’s oceans.
+
+Most major animal body plans appeared during this evolutionary explosion.`,
+
+trivia: `<b>From a dreamy, pre-Cambrian prologue to an explosion of life</b><br> Before the Cambrian explosion, there was the Ediacaran period (635–541 million years ago) — a world of soft, quilted organisms unlike anything alive today. They vanished almost completely before the Cambrian began, from unknown causes. Then the Cambrian explosion produced virtually every major animal body plan within about 25 million years — an eyeblink in geological time. Our best window into that explosion is the Burgess Shale in British Columbia, discovered in 1909 by the American palaeontologist Charles Walcott. Its extraordinary preservation captured soft-bodied creatures in exquisite detail, including a small, soft-bodied animal called Pikaia — likely one of the earliest chordates and a very distant ancestor of every vertebrate alive today (including us).`,
+
+facts:[
+{label:'Duration', value:'~25 million years', sub:'rapid diversification'},
+{label:'Environment', value:'Oceans', sub:'marine ecosystems'},
+{label:'Significance', value:'Complex Animals', sub:'major body plans'}
+]
+},
+
+{
+id:'dinosaurs',
+era:'life',
+date:'230–66 million years ago',
+title:'Age of Dinosaurs',
+color:'#5fb7c8',
+body:`Dinosaurs dominated terrestrial ecosystems for over 160 million years.
+
+An asteroid impact 66 million years ago caused a mass extinction that ended the reign of non-avian dinosaurs.`,
+
+trivia: `<b>We still live among dinosaurs</b><br> When the Chicxulub asteroid struck the Yucatán Peninsula 66 million years ago, the immediate blast was catastrophic — but what killed the dinosaurs was what came after. Billions of tonnes of soot and debris were thrown into the stratosphere, blocking sunlight for months to years. Photosynthesis and entire food chains collapsed. Large animals with large energy demands starved. Non-avian dinosaurs were wiped out within a geological instant. However, small, ground-dwelling birds survived — likely because they could eat seeds and insects that persisted in the darkness. Birds are not the descendants of dinosaurs. Under modern classification, they are dinosaurs, specifically surviving theropods. The largest animal ever to walk on land, Argentinosaurus, and the bulbul singing outside your window belong to the same evolutionary lineage. Dinosaurs are not extinct. About 10,000 species of them are alive today.`,
+
+facts:[
+{label:'Duration', value:'~165 million years', sub:'Mesozoic Era'},
+{label:'Extinction Event', value:'Chicxulub Impact', sub:'Yucatán Peninsula'},
+{label:'Survivors', value:'Birds', sub:'avian dinosaurs'}
+]
+},
+
+{
+id:'homo',
+era:'human',
+date:'~2.8 million years ago',
+title:'Genus Homo Emerges',
+color:'#8fd3c1',
+body:`The genus Homo evolved in Africa from earlier hominin ancestors.
+
+Stone tools and increasing brain size marked major evolutionary advances.`,
+
+trivia: `<b>We coexisted with at least several other human species</b><br> Homo sapiens is not the inevitable endpoint of a straight evolutionary ladder. At various points in the past, multiple species of the genus Homo existed simultaneously. When our ancestors first left Africa around 60,000–70,000 years ago, they encountered Neanderthals across Europe and Asia, Denisovans across Central and East Asia, and possibly Homo erectus in parts of Southeast Asia — a species that had been around for nearly two million years. We did not simply replace them. We interbred with them. Most people outside sub-Saharan Africa carry 1–2% Neanderthal DNA. Some Melanesian and Aboriginal Australian populations carry up to 5% Denisovan DNA. The last known Neanderthals died around 40,000 years ago, roughly the same time modern humans arrived in their territory. Whether they were outcompeted, absorbed, or simply unlucky remains hotly debated.`,
+
+facts:[
+{label:'Earliest Fossils', value:'~2.8 Mya', sub:'Ethiopia'},
+{label:'Tool Use', value:'Stone Tools', sub:'Oldowan industry'},
+{label:'Origin', value:'Africa', sub:'human ancestry'}
+]
+},
+
+{
+id:'sapiens',
+era:'human',
+date:'~300,000 years ago',
+title:'Homo sapiens',
+color:'#8fd3c1',
+body:`Modern humans appeared in Africa and eventually spread across the globe.
+
+Humans developed language, art, technology, and civilizations.`,
+
+trivia: `<b>One volcanic eruption almost ended the human story before it began</b><br> Around 74,000 years ago — just a few thousand years after modern humans began leaving Africa — the Toba supervolcano in what is now Sumatra erupted in the largest volcanic event in the last 2 million years. It ejected roughly 2,800 cubic kilometres of material, triggering a volcanic winter that may have lasted years and caused a global temperature drop of several degrees. Some early hypotheses suggested that human populations may have experienced a major genetic bottleneck at this time, possibly shrinking to a few thousand individuals, although later genetic evidence does not clearly support a single, catastrophic global collapse caused by the eruption.  What is well established is that early human populations were small and vulnerable to environmental change, and events like Toba may have shaped the fragile early survival of our species.`,
+
+facts:[
+{label:'Earliest Fossils', value:'~300,000 years', sub:'Morocco'},
+{label:'Migration', value:'Out of Africa', sub:'global expansion'},
+{label:'Species', value:'Homo sapiens', sub:'modern humans'}
+]
+},
+
+{
+id:'today',
+era:'human',
+date:'Today',
+title:'The Universe Today',
+color:'#8fd3c1',
+body:`The observable universe contains hundreds of billions to perhaps trillions of galaxies.
+
+Dark energy continues accelerating cosmic expansion, while humanity strives to make sense of this universe and our place in it.`,
+
+trivia: `<b>Enjoying it while it lasts</b><br> The universe is 13.8 billion years old, but star formation peaked around 10 billion years ago and has been declining ever since. We are living in the dusk of the stelliferous era. In about 5 billion years the Sun will exhaust its hydrogen, expand into a red giant, and likely engulf the Earth. In around 100 trillion years — roughly 7,000 times the current age of the universe — the last red dwarf stars will flicker out. After that comes the degenerate era: a cosmos of cooling white dwarfs, neutron stars, and black holes slowly radiating away their energy over timescales so vast they make the current age of the universe look like the first second of a human life. Eventually even black holes will evaporate, leaving behind a cold, dark, nearly uniform sea of particles spreading ever further apart. The universe today, with its billions of glittering galaxies and living planets, is arguably in one of the most dynamic periods in its entire history.`,
+
+facts:[
+{label:'Universe Age', value:'13.8 billion years', sub:'current estimate'},
+{label:'Galaxies', value:'100B–2T', sub:'observable universe'},
+{label:'Future', value:'Continued Expansion', sub:'dark energy'}
+]
+}
+
+];
+
+const eraBar = document.getElementById('eraBar');
+const timelineCol = document.getElementById('timelineCol');
+const detailContent = document.getElementById('detailContent');
+
+ERAS.forEach(era => {
+
+  const btn = document.createElement('button');
+  btn.className = 'era-btn';
+  btn.innerText = era.label;
+  btn.onclick = () => {
+    document.getElementById('era-' + era.id)
+      .scrollIntoView({behavior:'smooth'});
+  };
+  eraBar.appendChild(btn);
+
+  const label = document.createElement('div');
+  label.className = 'era-section-label';
+  label.id = 'era-' + era.id;
+  label.innerText = era.label;
+  timelineCol.appendChild(label);
+
+  EVENTS.filter(e => e.era === era.id).forEach((event,index)=>{
+
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+
+    item.innerHTML = `
+      <div class="item-dot"
+      style="background:${event.color};
+      box-shadow:0 0 12px ${event.color}">
+      </div>
+
+      <div>
+        <div class="item-date">${event.date}</div>
+        <div class="item-title">${event.title}</div>
+      </div>
+    `;
+
+    item.onclick = () => showEvent(event,item);
+
+    timelineCol.appendChild(item);
+
+    if(index === 0 && era.id === 'cosmic'){
+      showEvent(event,item);
+    }
+
+  });
+
+});
+
+function showEvent(event,el){
+
+  document.querySelectorAll('.timeline-item')
+    .forEach(i => i.classList.remove('active'));
+
+  if(el){
+    el.classList.add('active');
+  }
+
+  detailContent.innerHTML = `
+    <div class="detail-content">
+
+      <div class="detail-era"
+      style="
+      background:${event.color}22;
+      color:${event.color};
+      border:1px solid ${event.color}44">
+      ${ERAS.find(e => e.id === event.era).label}
+      </div>
+
+      <div class="detail-date">${event.date}</div>
+
+      <div class="detail-title">${event.title}</div>
+
+      <div class="detail-visual">
+        ${generateVisual(event.color)}
+      </div>
+
+      <div class="detail-body">
+        ${event.body
+          .split('\\n\\n')
+          .map(p => `<p>${p}</p>`)
+          .join('')}
+      </div>
+
+      <div class="detail-facts">
+        ${event.facts.map(f => `
+          <div class="fact-card">
+            <div class="fact-label">${f.label}</div>
+            <div class="fact-value">${f.value}</div>
+            <div class="fact-sub">${f.sub}</div>
+          </div>
+        `).join('')}
+      </div>
+${event.trivia ? `
+  <div class="trivia-box">
+
+    <div class="trivia-title">
+     Did You Know?
+    </div>
+
+    <div class="trivia-text">
+      ${event.trivia}
+    </div>
+
+  </div>
+` : ''}
+
+    </div>
+  `;
+}
+
+function generateVisual(color){
+
+  return `
+  <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg">
+
+    <defs>
+      <radialGradient id="g">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#021414" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <rect width="600" height="220" fill="#021414"/>
+
+    <circle cx="300" cy="110" r="90" fill="url(#g)"/>
+
+    ${
+      [...Array(60)].map(()=>`
+      <circle
+      cx="${Math.random()*600}"
+      cy="${Math.random()*220}"
+      r="${Math.random()*2}"
+      fill="white"
+      opacity="${0.1 + Math.random()*0.8}"/>
+      `).join('')
+    }
+
+  </svg>
+  `;
+}
+
+/* Starfield */
+
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+
+let stars = [];
+
+function resize(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function createStars(){
+
+  stars = [];
+
+  for(let i=0;i<220;i++){
+
+    stars.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*1.6,
+      a:Math.random(),
+      s:0.2 + Math.random()*0.6
+    });
+  }
+}
+
+function animate(){
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  stars.forEach(star=>{
+
+    star.y += star.s * 0.03;
+
+    if(star.y > canvas.height){
+      star.y = 0;
+      star.x = Math.random()*canvas.width;
+    }
+
+    ctx.beginPath();
+    ctx.arc(star.x,star.y,star.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${star.a})`;
+    ctx.fill();
+
+  });
+
+  requestAnimationFrame(animate);
+}
+
+resize();
+createStars();
+animate();
+
+window.addEventListener('resize',()=>{
+  resize();
+  createStars();
+});
+
+</script>
+
+</body>
+</html>
