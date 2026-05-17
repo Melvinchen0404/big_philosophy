@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Philosophy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#04050f;
+  --bg2:#080a1a;
+  --gold:#fbbf24;
+  --gold-light:#fde68a;
+  --cyan:#38bdf8;
+  --purple:#a78bfa;
+  --red:#fb7185;
+  --green:#4ade80;
+  --text:#f8fafc;
+  --text-dim:#94a3b8;
+  --border:rgba(255,255,255,0.08);
+  --card-bg:rgba(15,23,42,0.88);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:'Cormorant Garamond',serif;
+  background:
+    radial-gradient(circle at top left, rgba(15,120,120,0.12), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(20,180,170,0.10), transparent 40%),
+    var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+#starfield{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+.nebula-blob{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:0.16;
+  pointer-events:none;
+  z-index:1;
+}
+
+/* ── Header ── */
+header{
+  position:relative;
+  z-index:10;
+  text-align:center;
+  padding:60px 20px 40px;
+  background:linear-gradient(to bottom, rgba(2,20,20,0.98), transparent);
+}
+
+.back-link{
+  display:inline-block;
+  margin-bottom:28px;
+  font-family:'Space Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  text-decoration:none;
+  border:1px solid var(--border);
+  padding:7px 14px;
+  border-radius:4px;
+  transition:0.2s;
+}
+.back-link:hover{
+  color:var(--gold-light);
+  border-color:rgba(251,191,36,0.4);
+}
+
+header h1{
+  font-size:clamp(2.2rem,5vw,4.2rem);
+  font-weight:300;
+  letter-spacing:0.12em;
+  color:var(--gold-light);
+  margin-bottom:14px;
+  text-shadow:0 0 40px rgba(199,255,243,0.15);
+}
+
+header p{
+  font-family:'Space Mono',monospace;
+  font-size:0.72rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+}
+
+/* ── Legend bar ── */
+.legend-bar{
+  position:relative;
+  z-index:10;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:20px;
+  padding:14px 24px;
+  background:rgba(2,20,20,0.7);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+}
+.legend-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+/* ── Main layout ── */
+.page-body{
+  position:relative;
+  z-index:5;
+  display:flex;
+  gap:0;
+}
+
+/* ── Discipline sidebar ── */
+.disc-sidebar{
+  width:260px;
+  flex-shrink:0;
+  height:calc(100vh - 160px);
+  overflow-y:auto;
+  position:sticky;
+  top:0;
+  border-right:1px solid var(--border);
+  padding:24px 0 24px;
+}
+.disc-sidebar::-webkit-scrollbar{ width:4px; }
+.disc-sidebar::-webkit-scrollbar-thumb{ background:var(--border); }
+
+.sidebar-label{
+  font-family:'Space Mono',monospace;
+  font-size:0.52rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  padding:18px 22px 8px;
+  border-top:1px solid var(--border);
+}
+.sidebar-label:first-child{ border-top:none; padding-top:0; }
+
+.disc-item{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:10px 22px;
+  cursor:pointer;
+  transition:0.2s;
+  position:relative;
+}
+.disc-item:hover{ background:rgba(255,255,255,0.03); }
+.disc-item.active{
+  background:rgba(143,211,193,0.08);
+}
+.disc-item.active::before{
+  content:"";
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:3px;
+  background:var(--gold);
+}
+.disc-dot{
+  width:9px; height:9px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.disc-name{
+  font-size:0.95rem;
+  line-height:1.3;
+}
+
+/* ── Detail panel ── */
+.detail-panel{
+  flex:1;
+  padding:40px 56px;
+  max-width:860px;
+}
+
+.detail-content{
+  animation:fadeIn 0.35s ease;
+}
+@keyframes fadeIn{
+  from{ opacity:0; transform:translateY(8px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+.detail-cat{
+  display:inline-block;
+  padding:5px 12px;
+  border-radius:4px;
+  margin-bottom:18px;
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+}
+
+.detail-title{
+  font-size:clamp(1.8rem,3.5vw,2.8rem);
+  font-weight:300;
+  color:var(--gold-light);
+  margin-bottom:10px;
+  letter-spacing:0.04em;
+}
+
+.detail-subtitle{
+  font-family:'Space Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  margin-bottom:26px;
+}
+
+.detail-visual{
+  height:180px;
+  margin-bottom:28px;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+
+.detail-body{
+  font-size:1.1rem;
+  line-height:1.9;
+  color:var(--text);
+}
+.detail-body p + p{ margin-top:16px; }
+
+/* ── Key questions ── */
+.questions-block{
+  margin-top:28px;
+  padding:22px 24px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+}
+.questions-title{
+  font-family:'Space Mono',monospace;
+  font-size:0.55rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  margin-bottom:14px;
+}
+.question-list{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.question-list li{
+  font-size:1rem;
+  color:var(--text-dim);
+  padding-left:16px;
+  position:relative;
+  line-height:1.6;
+}
+.question-list li::before{
+  content:"•";
+  position:absolute;
+  left:0;
+  color:var(--gold);
+  font-size:0.7rem;
+  top:3px;
+}
+
+/* ── Papers grid ── */
+.papers-title{
+  font-family:'Space Mono',monospace;
+  font-size:0.55rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  margin:28px 0 14px;
+}
+
+.papers-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(240px,1fr));
+  gap:14px;
+}
+
+.paper-card{
+  padding:18px 20px;
+  border-radius:8px;
+  background:rgba(15,23,42,0.7);
+  border:1px solid var(--border);
+  cursor:pointer;
+  text-decoration:none;
+  display:block;
+  transition:0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.paper-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg, rgba(251,191,36,0.05), transparent);
+  opacity:0;
+  transition:0.2s;
+}
+.paper-card:hover{
+  border-color:rgba(251,191,36,0.3);
+  transform:translateY(-2px);
+}
+.paper-card:hover::before{ opacity:1; }
+
+.paper-type{
+  font-family:'Space Mono',monospace;
+  font-size:0.5rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  margin-bottom:7px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.paper-type-dot{
+  width:5px; height:5px;
+  border-radius:50%;
+  background:var(--gold);
+  flex-shrink:0;
+}
+
+.paper-title{
+  font-size:0.98rem;
+  color:var(--gold-light);
+  line-height:1.4;
+  margin-bottom:6px;
+}
+
+.paper-author{
+  font-family:'Space Mono',monospace;
+  font-size:0.55rem;
+  color:var(--text-dim);
+  letter-spacing:0.06em;
+}
+
+.paper-download{
+  margin-top:12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family:'Space Mono',monospace;
+  font-size:0.52rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--gold);
+  opacity:0;
+  transition:0.2s;
+}
+.paper-card:hover .paper-download{ opacity:1; }
+
+.paper-download svg{
+  width:11px; height:11px;
+  stroke:var(--gold);
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+/* ── Nav ── */
+.nav{
+  display:flex;
+  gap:12px;
+  margin-top:36px;
+}
+.nav button{
+  background:none;
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:9px 16px;
+  cursor:pointer;
+  border-radius:4px;
+  transition:0.2s;
+  font-family:'Space Mono',monospace;
+  font-size:0.62rem;
+}
+.nav button:hover{
+  border-color:var(--gold);
+  color:var(--gold-light);
+}
+
+/* ── Responsive ── */
+@media(max-width:860px){
+  .page-body{ flex-direction:column; }
+  .disc-sidebar{ width:100%; height:auto; position:relative; border-right:none; border-bottom:1px solid var(--border); }
+  .detail-panel{ padding:28px 18px; }
+  .papers-grid{ grid-template-columns:1fr 1fr; }
+}
+@media(max-width:520px){
+  .papers-grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="starfield"></canvas>
+
+<div class="nebula-blob"
+  style="width:600px;height:600px;top:-150px;left:-200px;
+  background:radial-gradient(circle,#4338ca,transparent)">
+</div>
+<div class="nebula-blob"
+  style="width:480px;height:480px;top:35%;right:-100px;
+  background:radial-gradient(circle,#7c3aed,transparent)">
+</div>
+<div class="nebula-blob"
+  style="width:420px;height:420px;bottom:-80px;left:22%;
+  background:radial-gradient(circle,#2563eb,transparent)">
+</div>
+
+<header>
+  <a href="index.htm" class="back-link">← Timeline of the Universe</a>
+  <h1>Big Philosophy</h1>
+  <p>Foundations · Questions · Suggested Readings · Research</p>
+</header>
+
+<div class="legend-bar">
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#38bdf8;box-shadow:0 0 8px #38bdf8"></div>
+    Formal sciences
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#a78bfa;box-shadow:0 0 8px #a78bfa"></div>
+    Physical sciences
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#4ade80;box-shadow:0 0 8px #4ade80"></div>
+    Life sciences
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#fb923c;box-shadow:0 0 8px #fb923c"></div>
+    Cognitive sciences
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#fbbf24;box-shadow:0 0 8px #fbbf24"></div>
+    Social sciences
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- Sidebar -->
+  <div class="disc-sidebar" id="discSidebar"></div>
+
+  <!-- Detail -->
+  <div class="detail-panel">
+    <div id="detailContent"></div>
+  </div>
+
+</div>
+
+<script>
+const CATEGORIES = [
+  { id:'formal',   label:'Formal Sciences',    color:'#38bdf8' },
+  { id:'physical', label:'Physical Sciences',   color:'#a78bfa' },
+  { id:'life',     label:'Life Sciences',       color:'#4ade80' },
+  { id:'cognitive', label:'Cognitive Sciences',  color:'#fb923c' },
+  { id:'social',   label:'Social Sciences',     color:'#fbbf24' },
+];
+
+const DISCIPLINES = [
+  {
+    id:'logic',
+    cat:'formal',
+    name:'Logic',
+    subtitle:'Alphabet, syntax, proof theory, validity',
+    color:'#38bdf8',
+    body:`Logic investigates the principles of correct reasoning. From Aristotle's syllogisms to modern proof theory and modal logic, it forms the backbone of every other discipline.
+
+Its methods are purely formal — validity depends on structure, not content. An argument can be valid, even if not all of its premises are true.`,
+    questions:[
+      'What distinguishes a valid argument from a sound one?',
+      'Are the laws of logic discovered or invented?',
+      'Can there be true contradictions?',
+      'What is the relationship between logic and language?',
+    ],
+    papers:[
+      { title:'Prior Analytics', author:'Aristotle', year:'c. 350 B.C.E.', type:'Foundational text', url:'https://classics.mit.edu/Aristotle/prior.html' },
+      { title:'Begriffsschrift', author:'Gottlob Frege', year:'1879', type:'Foundational text', url:'readings/frege.pdf' },
+    ],
+myResearch:[
+  { title:'The <i>via negativa</i>: A general theory of structure (under review)', year:'2026', notes:'In what sense is logic foundational and ontologically prior to mathematics, physics, and so on?', url:'research/vn.pdf' },  
+{ title:'Making sense of the Bolzano-Carroll-Wilson paradox (published)', year:'2026', notes:'How do we avoid the problem of infinite regress when making inferences?', url:'https://www.tandfonline.com/doi/full/10.1080/01445340.2026.2620326' },
+],
+  },
+  {
+    id:'mathematics',
+    cat:'formal',
+    name:'Mathematics',
+    subtitle:'Semantics, interpretation, model, truth',
+    color:'#38bdf8',
+    body:`Mathematics seems to be the perfect language for describing our universe. How do we come to know mathematical truths and why mathematics is so unreasonably effective at describing the physical world?
+
+Do numbers exist independently of minds (discovered) or are they human constructions (invented)? Can all of mathematics be grounded in logic?`,
+    questions:[
+      'Do mathematical objects exist in a mind-independent manner?',
+      'How do we have knowledge of abstract objects?',
+      'Is mathematics discovered or invented?',
+      'Why is mathematics so effective in natural science?',
+      'Are all mathematical truths provable?',
+    ],
+    papers:[
+      { title:'Elements', author:'Euclid', year:'c. 300 B.C.E.', type:'Foundational text', url:'https://classics.mit.edu/Euclid/euc.html' },
+      { title:'The Unreasonable Effectiveness of Mathematics', author:'Eugene Wigner', year:'1960', type:'Foundational text', url:'readings/wigner.pdf' },
+    ],
+myResearch:[
+  { title:'Structure all the way down: Why mathematics works (under review)', year:'2026', notes:'Why does mathematics work? What are mathematical entities and do they exist in a mind-independent manner? If they exist in a mind-independent manner, how do we come to gain knowledge of them?', url:'research/platonism.pdf' },  
+],
+  },
+  {
+    id:'physics',
+    cat:'physical',
+    name:'Physics',
+    subtitle:'Space, time, matter, causation',
+    color:'#a78bfa',
+    body:`What is the nature of the physical universe? Did our universe have a beginning? Will it have an end? 
+
+What is time? What are the connections between logic and mathematics (the formal sciences), physics (a fundamental science), and the special sciences?`,
+    questions:[
+      'Does the arrow of time require explanation?',
+      'What is a physical law — necessity or contingency?',
+      'What is the correct interpretation of quantum mechanics?',
+      'Is there a multiverse, and what would it mean if we live in a multiverse?',
+    ],
+    papers:[
+      { title:'Philosophiæ Naturalis Principia Mathematica', author:'Isaac Newton', year:'1687', type:'Foundational text', url:'https://en.wikisource.org/wiki/The_Mathematical_Principles_of_Natural_Philosophy_(1846)' },
+      { title:'The Assayer', author:'Galileo Galilei', year:'1623', type:'Foundational text', url:'readings/galileo.pdf' },
+    ],
+myResearch:[
+  { title:'Structure all the way down: Why mathematics works (under review)', year:'2026', notes:'Why can we not rewrite physics without mathematics?', url:'research/platonism.pdf' },  
+],
+  },
+  {
+    id:'chemistry',
+    cat:'physical',
+    name:'Chemistry',
+    subtitle:'Mass, composition, reactions, dissipation',
+    color:'#a78bfa',
+    body:`Despite its central role in science, chemistry has received comparatively little philosophical attention until recent decades. Can chemistry be reduced to physics? What makes something a chemical kind?`,
+    questions:[
+      'Is chemistry reducible to quantum mechanics?',
+      'What are chemical natural kinds — water, gold?',
+      'What is a chemical bond, ontologically speaking?',
+      'Do molecular structures exist, or are they models?',
+      'What role does mechanism play in chemical explanation?',
+    ],
+    papers:[
+      { title:'The Sceptical Chymist', author:'Robert Boyle', year:'1661', type:'Foundational text', url:'https://www.gutenberg.org/ebooks/22914' },
+      { title:'A New System of Chemical Philosophy', author:'John Dalton', year:'1808-27', type:'Foundational text', url:'https://archive.org/details/newsystemofchemi01daltuoft' },
+    ],
+myResearch:[
+  { title:'The meaning of molecules: A theory of chemical structure (under review)', year:'2026', notes:'How can we defend a formal theory of chemical structure in terms of an alphabet, a syntax, a semantics, and an interpretation?', url:'research/chem.pdf' },  
+],
+  },
+  {
+    id:'biology',
+    cat:'life',
+    name:'Biology',
+    subtitle:'Life, function, evolution, teleology',
+    color:'#4ade80',
+    body:`What does it mean for something to be alive? How can we explain the nature of biological function and the logic of evolutionary explanation? Can biology be reduced to chemistry and physics?`,
+    questions:[
+      'What makes something alive? Is there a sharp boundary?',
+      'What is biological function?',
+      'Are species real natural kinds or convenient groupings?',
+      'Can evolutionary theory explain altruism?',
+    ],
+    papers:[
+      { title:'What is Life?', author:'Erwin Schrödinger', year:'1944', type:'Foundational text', url:'readings/schrodinger.pdf' },
+      { title:'Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid', author:'James D. Watson and Francis Crick', year:'1953', type:'Foundational text', url:'readings/crickwatson.pdf' },
+    ],
+myResearch:[
+  { title:'As easy as CHNOPS: A theory of biological structure (under review)', year:'2026', notes:'Can the specific elemental composition of life be derived from a minimal set of thermodynamically grounded conditions', url:'research/chnops.pdf' },
+  { title:'The minimal architecture of life: A rational reconstruction of biological structure (under review)', year:'2026', notes:'What makes DNA structure the way that it is?', url:'research/dna.pdf' },
+],  
+  },
+  {
+    id:'biomedical',
+    cat:'life',
+    name:'Biomedical sciences',
+    subtitle:'Health, disease, well-being, intervention',
+    color:'#4ade80',
+    body:`What constitutes health and disease? How do we move from biological understanding to medical intervention? 
+
+What are the ethical boundaries of biomedical research and treatment?`,
+    questions:[
+      'How do we distinguish between health and disease?',
+      'How do we balance mechanistic understanding with clinical outcomes?',
+      'Can we define health positively, or only as the mere absence of disease?',
+      'What counts as a good biomedical treatment?',
+    ],
+    papers:[
+      { title:'On the Sacred Disease', author:'Hippocrates', year:'c. 400 B.C.E.', type:'Foundational text', url:'https://classics.mit.edu/Hippocrates/sacred.html' },
+      { title:'An Introduction to the Study of Experimental Medicine', author:'Claude Bernard', year:'1865', type:'Foundational text', url:'https://commons.wikimedia.org/wiki/File:An_Introduction_to_the_Study_of_Experimental_Medicine.pdf' },
+    ],
+myResearch:[
+  { title:'Health as coordinated reversibility (under review)', year:'2026', notes:'What is health? How do we distinguish between healthy and diseased or pathological states?', url:'research/health.pdf' },
+],  
+  },
+  {
+    id:'neuroscience',
+    cat:'cognitive',
+    name:'Neuroscience',
+    subtitle:'Information, brain, consciousness, mind',
+    color:'#fb923c',
+    body:`The central puzzle here is the hard problem of consciousness: why does physical brain activity give rise to subjective experience at all?
+
+How did neurons arise as specialized cells for processing information? In addition, how did biological neural networks provide the basis of cognition, intelligence, free will, and personal identity? Can consciousness be instantiated in artificial neural networks too?`,
+    questions:[
+      'Why does brain activity produce subjective experience?',
+      'Can neuroscience explain consciousness, or only correlate it?',
+      'What is the relationship between the mind and the brain?',
+      'Do neurons implement computation — and what kind?',
+      'What do disorders of consciousness reveal about the self?',
+    ],
+    papers:[
+      { title:'Computing Machinery and Intelligence', author:'Alan Turing', year:'1950', type:'Foundational text', url:'readings/turing.pdf' },
+      { title:'Other Minds', author:'Peter Godfrey-Smith', year:'2016', type:'Foundational text', url:'readings/godfreysmith.pdf' },
+    ],
+myResearch:[
+  { title:'Intelligence is physical (cited by Geoffrey Hinton, Nobel laureate in physics, and under review)', year:'2026', notes:'Despite the prominence of formalist theories of intelligence within the artificial intelligence research tradition, intelligence cannot be fully understood as a purely formal or symbolic process. How do we theorize afresh about intelligence?', url:'research/matryoshka.pdf' },
+  { title:'The problem of consciousness is less hard than you think (under review)', year:'2026', notes:'How can a thermodynamic-informational account of consciousness, grounded in the dynamics of systems maintained far from equilibrium, be defended?', url:'research/consciousness.pdf' },
+],  
+  },
+  {
+    id:'social',
+    cat:'social',
+    name:'Social sciences and humanities',
+    subtitle:'Values, norms, reasons, culture',
+    color:'#fbbf24',
+    body:`How do social structures, norms, and institutions shape and organize human behaviour?
+
+Why do we human beings value the things that we value? How do we make sense of our place in the universe and what we owe to each other?`,
+    questions:[
+      'Are social facts reducible to facts about individuals?',
+      'What makes a norm binding?',
+      'How do we make sense of the universe, our place in it, and what we owe to each other?',
+    ],
+    papers:[
+      { title:'The Republic', author:'Plato', year:'c. 375 B.C.E.', type:'Foundational text', url:'https://www.gutenberg.org/ebooks/1497' },
+      { title:'The Methods of Ethics', author:'Henry Sidgwick', year:'1874', type:'Foundational text', url:'https://www.gutenberg.org/files/46743/46743-h/46743-h.htm' },
+    ],
+myResearch:[
+  { title:'Active inference and the grounding problem: Toward a more general theory of intelligence (under review)', year:'2026', notes:'How can any theory of agency that purports to explain goal-directed behaviour account for the origin of its evaluative structure?', url:'research/grounding.pdf' },  
+{ title:'The predation problem, reciprocity, and the limits of consequentialism (under review)', year:'2026', notes:'How might phenomenal consciousness ground value and reciprocity ground normativity within a two-tiered normative framework?', url:'research/predation.pdf'},
+],
+  },
+
+];
+
+/* ── Build sidebar ── */
+const sidebar = document.getElementById('discSidebar');
+const detailContent = document.getElementById('detailContent');
+
+let currentIndex = 0;
+
+CATEGORIES.forEach(cat => {
+  const label = document.createElement('div');
+  label.className = 'sidebar-label';
+  label.textContent = cat.label;
+  sidebar.appendChild(label);
+
+  DISCIPLINES.filter(d => d.cat === cat.id).forEach(disc => {
+    const item = document.createElement('div');
+    item.className = 'disc-item';
+    item.dataset.id = disc.id;
+    item.innerHTML = `
+      <div class="disc-dot" style="background:${disc.color};box-shadow:0 0 10px ${disc.color}44"></div>
+      <div class="disc-name">${disc.name}</div>
+    `;
+    item.onclick = () => {
+      document.querySelectorAll('.disc-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      currentIndex = DISCIPLINES.findIndex(d => d.id === disc.id);
+      showDisc(disc);
+    };
+    sidebar.appendChild(item);
+  });
+});
+
+function generateVisual(color){
+  const stars = [...Array(55)].map(() =>
+    `<circle cx="${Math.random()*600}" cy="${Math.random()*180}"
+     r="${Math.random()*1.8}" fill="white" opacity="${0.1 + Math.random()*0.75}"/>`
+  ).join('');
+  return `
+  <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+    <defs>
+      <radialGradient id="vg_${color.replace('#','')}">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.65"/>
+        <stop offset="100%" stop-color="#021414" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="600" height="180" fill="#021414"/>
+    <circle cx="300" cy="90" r="80" fill="url(#vg_${color.replace('#','')})"/>
+    ${stars}
+  </svg>`;
+}
+
+function showDisc(disc){
+  const cat = CATEGORIES.find(c => c.id === disc.cat);
+  detailContent.innerHTML = `
+    <div class="detail-content">
+      <div class="detail-cat"
+        style="background:${disc.color}18;color:${disc.color};border:1px solid ${disc.color}44">
+        ${cat.label}
+      </div>
+      <div class="detail-title">${disc.name}</div>
+      <div class="detail-subtitle">${disc.subtitle}</div>
+
+      <div class="detail-visual">${generateVisual(disc.color)}</div>
+
+      <div class="detail-body">
+        ${disc.body.split('\n\n').map(p => `<p>${p}</p>`).join('')}
+      </div>
+
+      <div class="questions-block">
+        <div class="questions-title">Key Questions</div>
+        <ul class="question-list">
+          ${disc.questions.map(q => `<li>${q}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div class="papers-title">Suggested Readings</div>
+      <div class="papers-grid">
+        ${disc.papers.map(p => `
+          <a class="paper-card" href="${p.url}" target="_blank" rel="noopener">
+            <div class="paper-type">
+              <div class="paper-type-dot"></div>
+              ${p.type} · ${p.year}
+            </div>
+            <div class="paper-title">${p.title}</div>
+            <div class="paper-author">${p.author}</div>
+            <div class="paper-download">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Access resource
+            </div>
+          </a>
+        `).join('')}
+      </div>
+
+${disc.myResearch && disc.myResearch.length ? `
+  <div class="papers-title" style="margin-top:32px">Research</div>
+  <div class="papers-grid">
+    ${disc.myResearch.map(p => `
+      <a class="paper-card" href="${p.url}" target="_blank" rel="noopener"
+         style="border-color:rgba(251,191,36,0.2)">
+        <div class="paper-type">
+          <div class="paper-type-dot" style="background:var(--gold)"></div>
+          ${p.year}
+        </div>
+        <div class="paper-title">${p.title}</div>
+        <div class="paper-author" style="color:var(--text-dim);font-style:italic">${p.notes}</div>
+        <div class="paper-download">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Access file
+        </div>
+      </a>
+    `).join('')}
+  </div>
+` : ''}
+
+      <div class="nav">
+        <button onclick="navigate(-1)">← Previous</button>
+        <button onclick="navigate(1)">Next →</button>
+      </div>
+    </div>
+  `;
+}
+
+function navigate(dir){
+  currentIndex = (currentIndex + dir + DISCIPLINES.length) % DISCIPLINES.length;
+  const disc = DISCIPLINES[currentIndex];
+  document.querySelectorAll('.disc-item').forEach(i => i.classList.remove('active'));
+  document.querySelector(`.disc-item[data-id="${disc.id}"]`).classList.add('active');
+  document.querySelector(`.disc-item[data-id="${disc.id}"]`).scrollIntoView({behavior:'smooth', block:'nearest'});
+  showDisc(disc);
+}
+
+/* Show first on load */
+const firstItem = document.querySelector('.disc-item');
+if(firstItem){ firstItem.classList.add('active'); }
+showDisc(DISCIPLINES[0]);
+
+/* ── Starfield ── */
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resize(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function createStars(){
+  stars = [];
+  for(let i=0;i<220;i++){
+    stars.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*1.6,
+      a:Math.random(),
+      s:0.2 + Math.random()*0.6
+    });
+  }
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(star => {
+    star.y += star.s * 0.03;
+    if(star.y > canvas.height){ star.y = 0; star.x = Math.random()*canvas.width; }
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${star.a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+
+resize(); createStars(); animate();
+window.addEventListener('resize', () => { resize(); createStars(); });
+</script>
+
+</body>
+</html>
